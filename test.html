@@ -20,7 +20,7 @@
 <body>
   <h2>都道府県をクリック：色を変え、選択状態を記憶します</h2>
   <div id="map-container">
-    <!-- ↓以下に Geolonia の map-full.svg の <svg>…</svg> を丸ごと貼り付け -->
+    <!-- Geolonia の map-full.svg をここに丸ごと貼り付け -->
     <svg class="geolonia-svg-map" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
     <title>Japanese Prefectures</title>
     <desc>Created by Geolonia (https://geolonia.com/).</desc>
@@ -246,7 +246,8 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'selectedPrefectures';
+    const STORAGE_KEY = 'selectedPrefCodes';
+
     function loadSelected() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -260,14 +261,23 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const selected = new Set(loadSelected());
+
       document.querySelectorAll('.geolonia-svg-map .prefecture').forEach(el => {
-        const id = el.getAttribute('id');
-        if (selected.has(id)) el.classList.add('selected');
+        const code = el.getAttribute('data-code');
+        if (!code) return;
+
+        if (selected.has(code)) {
+          el.classList.add('selected');
+        }
+
         el.addEventListener('click', () => {
           el.classList.toggle('selected');
-          if (el.classList.contains('selected')) selected.add(id);
-          else selected.delete(id);
-          saveSelected(Array.from(selected));
+          if (el.classList.contains('selected')) {
+            selected.add(code);
+          } else {
+            selected.delete(code);
+          }
+          saveSelected([...selected]);
         });
       });
     });
